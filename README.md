@@ -1,0 +1,137 @@
+# POPULATE MONGO DATABASE WITH FAKE DATA (to tests)
+
+Project structure
+
+```bash
+.
+├── node_modules
+├── src
+│   ├── services
+│   │   ├── populate.js
+│   │   ├── insert-documents.js
+│   │   └── generate-documents.js
+│   ├── db
+│   │   └── conn.js
+│   └── app.js
+├── package.json
+├── jsconfig.json
+├── docker-compose.yml
+├── bun.lockb
+├── README.md
+└── Dockerfile
+
+3 directories, 11 files
+```
+---
+
+### Required tecnologies to run project
+
+- Docker
+
+---
+### package.json scripts
+
+```json
+  "scripts": {
+    "populate": "bun src/app.js",
+    "up:db": "docker-compose up --build -d",
+    "down:db": "docker-compose down",
+    "clean:container": "docker rm -f $(docker ps -a -q) && docker rmi -f mongo-pulsar_mongo"
+  },
+
+```
+---
+
+### Commands to run project
+
+
+```javascript
+{
+    "up:db": "docker-compose up --build -d"
+}
+
+// first, you need run the up container command
+// If you have nodejs or bun installed on your machine, only run `bun up:db` or `npm run up:db`
+// Else, run manually docker-compose up --build -d
+
+```
+
+After up container with our custom image, you have two options:
+
+1. Run `bun populate` or `npm run populate` (remeber, you only run this command case you have bun or node on your machine)
+
+OR
+
+2. Exec `docker exec -it mongo-fakedb bun populate`
+
+
+
+After execute the populate command, you can see this on your terminal:
+
+```bash
+⬢ docker exec -it mongo-fakedb bun populate
+
+$ bun src/app.js
+
+simpleCollection1 | ※⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍ | 1% | 6s | 10000/1000000
+simpleCollection2 | ※⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍ | 1% | 5s | 15000/1000000
+simpleCollection3 | ※⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍ | 2% | 5s | 25000/1000000
+simpleCollection4 | ※⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍ | 2% | 5s | 25000/1000000
+complexCollection1 | ※⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍ | 1% | 5s | 10000/1000000
+complexCollection2 | ※⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍⁍ | 1% | 5s | 15000/1000000
+```
+
+<br>
+
+To access database for mongosh: \
+`docker exec -it mongo-fakedb mongosh`
+
+```bash
+test> show dbs
+admin    40.00 KiB
+myDB    2.86 GiB
+config  108.00 KiB
+local    40.00 KiB
+test>
+```
+
+URI to connect on mongosh:
+
+`"mongodb://localhost:27017/<database_name>"`
+
+**<database_name>** is optional, you can use only `mongodb://localhost:27017`
+
+If you want change:
+- quantity collections (and your names)
+- quantity documents for each collection
+- batch size to insert documents on db
+- database name
+
+
+You can edit options on src>app.js
+```javascript
+  const db = client.db('myDB'); // Your database name
+
+  const options = {
+    simpleCollections: simpleCollections, // Array to generate simple collections
+    complexCollections: complexCollections, // Array to generate complex collections
+    collectionSize: 1e6, // Quantity documents for each collection
+    batchSize: 5000, // Batch size to insert documents on db
+    db, // Database variable
+  };
+```
+
+
+### Notes
+
+simpleCollections collections do not have document sublevels, so in terms of storage they are smaller and simpler.
+
+complexCollections
+They have sublevels and end up being heavier and larger.
+
+TODO:
+ - Change options object to ENVIRONMENT variables on docker-compose.yml
+ - Change database name on app.js to ENVIRONMENT variable on docker-compose.yml
+
+
+**Application and image version: 1.0.0**
