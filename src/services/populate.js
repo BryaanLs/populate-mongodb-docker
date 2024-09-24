@@ -1,7 +1,11 @@
+import Bottleneck from 'bottleneck';
 import cliProgress from 'cli-progress';
-import { generateSimpleDocument, generateComplexDocument } from './generate-documents.js';
+import { generateComplexDocument, generateSimpleDocument } from './generate-documents.js';
 import { insertDocuments } from './insert-documents.js';
 
+const limiter = new Bottleneck({
+  maxConcurrent: 8,
+});
 export const populateDB = async (options) => {
   let simpleCollectionsPromises,
     complexCollectionsPromises = [];
@@ -16,13 +20,17 @@ export const populateDB = async (options) => {
 
   if (simpleCollections) {
     simpleCollectionsPromises = simpleCollections.map((collectionName) => {
-      return insertDocuments(collectionName, generateSimpleDocument, options, multiBar);
+      return limiter.schedule(() =>
+        insertDocuments(collectionName, generateSimpleDocument, options, multiBar),
+      );
     });
   }
 
   if (complexCollections) {
     complexCollectionsPromises = complexCollections.map((collectionName) => {
-      return insertDocuments(collectionName, generateComplexDocument, options, multiBar);
+      return limiter.schedule(() =>
+        insertDocuments(collectionName, generateComplexDocument, options, multiBar),
+      );
     });
   }
 
