@@ -17,9 +17,9 @@ const main = async () => {
     simpleCollections: simpleCollections,
     complexCollections: complexCollections,
     collectionSize: 1e6,
-    batchSize: 5000,
+    batchSize: 2500,
     db,
-    concurrence: 3
+    concurrence: 2
   };
 
   await populateDB(options);
