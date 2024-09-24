@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "populate": "bun src/app.js",
-    "up:db": "docker-compose up --build",
+    "up:db": "docker-compose up --build -d",
     "down:db": "docker-compose down",
     "clean:container": "docker rm -f $(docker ps -a -q) && docker rmi -f populate-mongodb-docker_mongo",
     "clean:volume": "docker volume rm -f populate-mongodb-docker_mongo-data",
