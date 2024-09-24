@@ -22,6 +22,7 @@ Project structure
 
 3 directories, 11 files
 ```
+
 ---
 
 ### Required tecnologies to run project
@@ -29,6 +30,7 @@ Project structure
 - Docker
 
 ---
+
 ### package.json scripts
 
 ```json
@@ -36,14 +38,48 @@ Project structure
     "populate": "bun src/app.js",
     "up:db": "docker-compose up --build -d",
     "down:db": "docker-compose down",
-    "clean:container": "docker rm -f $(docker ps -a -q) && docker rmi -f mongo-pulsar_mongo"
+    "clean:container": "docker rm -f $(docker ps -a -q) && docker rmi -f populate-mongodb-docker_populate-fakedb",
+    "clean:volume": "docker volume rm -f populate-mongodb-docker_mongo-data",
+    "clean:all":"bun run clean:container && bun run clean:volume"
   },
 
 ```
+
+## Scripts description
+
+#### `populate`
+
+- **Command**: `bun src/app.js`
+- **Description**: Runs `app.js` to populate MongoDB with options defined in the main scope.
+
+#### `up:db`
+
+- **Command**: `docker-compose up --build -d`
+- **Description**: Builds and starts Docker containers in the background.
+
+#### `down:db`
+
+- **Command**: `docker-compose down`
+- **Description**: Stops and removes all Docker containers, networks, and volumes.
+
+#### `clean:container`
+
+- **Command**: `docker rm -f $(docker ps -a -q) && docker rmi -f populate-mongodb-docker_populate-fakedb`
+- **Description**: Forcefully removes all stopped containers and a specific Docker image.
+
+#### `clean:volume`
+
+- **Command**: `docker volume rm -f populate-mongodb-docker_mongo-data`
+- **Description**: Forcefully removes the MongoDB data volume.
+
+#### `clean:all`
+
+- **Command**: `bun run clean:container && bun run clean:volume`
+- **Description**: Removes all stopped containers, a specific Docker image, and the MongoDB data volume.
+
 ---
 
 ### Commands to run project
-
 
 ```javascript
 {
@@ -63,8 +99,6 @@ After up container with our custom image, you have two options:
 OR
 
 2. Exec `docker exec -it mongo-fakedb bun populate`
-
-
 
 After execute the populate command, you can see this on your terminal:
 
@@ -102,25 +136,25 @@ URI to connect on mongosh:
 **<database_name>** is optional, you can use only `mongodb://localhost:27017`
 
 If you want change:
+
 - quantity collections (and your names)
 - quantity documents for each collection
 - batch size to insert documents on db
 - database name
 
-
 You can edit options on src>app.js
+
 ```javascript
-  const db = client.db('myDB'); // Your database name
+const db = client.db("myDB"); // Your database name
 
-  const options = {
-    simpleCollections: simpleCollections, // Array to generate simple collections
-    complexCollections: complexCollections, // Array to generate complex collections
-    collectionSize: 1e6, // Quantity documents for each collection
-    batchSize: 5000, // Batch size to insert documents on db
-    db, // Database variable
-  };
+const options = {
+  simpleCollections: simpleCollections, // Array to generate simple collections
+  complexCollections: complexCollections, // Array to generate complex collections
+  collectionSize: 1e6, // Quantity documents for each collection
+  batchSize: 5000, // Batch size to insert documents on db
+  db, // Database variable
+};
 ```
-
 
 ### Notes
 
@@ -130,8 +164,8 @@ complexCollections
 They have sublevels and end up being heavier and larger.
 
 TODO:
- - Change options object to ENVIRONMENT variables on docker-compose.yml
- - Change database name on app.js to ENVIRONMENT variable on docker-compose.yml
 
+- Change options object to ENVIRONMENT variables on docker-compose.yml
+- Change database name on app.js to ENVIRONMENT variable on docker-compose.yml
 
 **Application and image version: 1.0.0**
