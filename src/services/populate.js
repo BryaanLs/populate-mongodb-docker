@@ -3,12 +3,15 @@ import cliProgress from 'cli-progress';
 import { generateComplexDocument, generateSimpleDocument } from './generate-documents.js';
 import { insertDocuments } from './insert-documents.js';
 
-const limiter = new Bottleneck({
-  maxConcurrent: 8,
-});
+
 export const populateDB = async (options) => {
   let simpleCollectionsPromises,
     complexCollectionsPromises = [];
+    const { simpleCollections, complexCollections, concurrence } = options;
+
+  const limiter = new Bottleneck({
+      maxConcurrent: concurrence ?? 3,
+    });
 
   const multiBar = new cliProgress.MultiBar({
     format: '{collectionName} | {bar} | {percentage}% | {duration_formatted} | {value}/{total}',
@@ -16,7 +19,6 @@ export const populateDB = async (options) => {
     barIncompleteChar: '⁍',
   });
 
-  const { simpleCollections, complexCollections } = options;
 
   if (simpleCollections) {
     simpleCollectionsPromises = simpleCollections.map((collectionName) => {

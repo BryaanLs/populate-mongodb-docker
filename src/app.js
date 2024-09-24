@@ -19,6 +19,7 @@ const main = async () => {
     collectionSize: 1e6,
     batchSize: 5000,
     db,
+    concurrence: 3
   };
 
   await populateDB(options);
