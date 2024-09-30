@@ -11,7 +11,6 @@ services:
       - mongo-data:/data/db
     environment:
       - DB_NAME=aurora-test
-    command:
 volumes:
   mongo-data:
     driver: local
