@@ -7,9 +7,9 @@
     "populate": "bun src/app.js",
     "up:db": "docker-compose up --build -d",
     "down:db": "docker-compose down",
-    "clean:container": "docker rm -f $(docker ps -a -q) && docker rmi -f populate-mongodb-docker_mongo",
+    "clean:container": "docker rm -f $(docker ps -a -q) && docker rmi -f populate-mongodb-docker_fake-db",
     "clean:volume": "docker volume rm -f populate-mongodb-docker_mongo-data",
-    "clean:all":"bun run clean:container && bun run clean:volume"
+    "clean:all": "bun run clean:container && bun run clean:volume"
   },
   "dependencies": {
     "bottleneck": "^2.19.5",
