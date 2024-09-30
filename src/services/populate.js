@@ -1,29 +1,36 @@
-import Bottleneck from 'bottleneck';
-import cliProgress from 'cli-progress';
-import { generateComplexDocument, generateSimpleDocument } from './generate-documents.js';
-import { insertDocuments } from './insert-documents.js';
-
+import Bottleneck from "bottleneck";
+import cliProgress from "cli-progress";
+import {
+  generateComplexDocument,
+  generateSimpleDocument,
+} from "./generate-documents.js";
+import { insertDocuments } from "./insert-documents.js";
 
 export const populateDB = async (options) => {
-  let simpleCollectionsPromises,
+  let simpleCollectionsPromises = [],
     complexCollectionsPromises = [];
-    const { simpleCollections, complexCollections, concurrence } = options;
+  const { simpleCollections, complexCollections, concurrence } = options;
 
   const limiter = new Bottleneck({
-      maxConcurrent: concurrence ?? 3,
-    });
-
-  const multiBar = new cliProgress.MultiBar({
-    format: '{collectionName} | {bar} | {percentage}% | {duration_formatted} | {value}/{total}',
-    barCompleteChar: '※',
-    barIncompleteChar: '⁍',
+    maxConcurrent: concurrence ?? 3,
   });
 
+  const multiBar = new cliProgress.MultiBar({
+    format:
+      "{collectionName} | {bar} | {percentage}% | {duration_formatted} | {value}/{total}",
+    barCompleteChar: "※",
+    barIncompleteChar: "⁍",
+  });
 
   if (simpleCollections) {
     simpleCollectionsPromises = simpleCollections.map((collectionName) => {
       return limiter.schedule(() =>
-        insertDocuments(collectionName, generateSimpleDocument, options, multiBar),
+        insertDocuments(
+          collectionName,
+          generateSimpleDocument,
+          options,
+          multiBar
+        )
       );
     });
   }
@@ -31,12 +38,20 @@ export const populateDB = async (options) => {
   if (complexCollections) {
     complexCollectionsPromises = complexCollections.map((collectionName) => {
       return limiter.schedule(() =>
-        insertDocuments(collectionName, generateComplexDocument, options, multiBar),
+        insertDocuments(
+          collectionName,
+          generateComplexDocument,
+          options,
+          multiBar
+        )
       );
     });
   }
 
-  await Promise.all([...simpleCollectionsPromises, ...complexCollectionsPromises]);
+  await Promise.all([
+    ...simpleCollectionsPromises,
+    ...complexCollectionsPromises,
+  ]);
   multiBar.stop();
-  console.log('Banco de dados populado com sucesso!');
+  console.log("Banco de dados populado com sucesso!");
 };
