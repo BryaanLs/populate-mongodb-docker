@@ -1,12 +1,7 @@
 import { conn } from "./db/conn.js";
 import { populateDB } from "./services/populate.js";
 
-const simpleCollections = [
-  "simpleCollection1",
-  "simpleCollection2",
-  "simpleCollection3",
-  "simpleCollection4",
-];
+const simpleCollections = ["pessoas", "funcionarios", "usuarios", "cadastros"];
 const complexCollections = ["complexCollection1", "complexCollection2"];
 
 const main = async () => {
@@ -17,9 +12,9 @@ const main = async () => {
     simpleCollections: simpleCollections,
     complexCollections: complexCollections,
     collectionSize: 1e5,
-    batchSize: 2500,
+    batchSize: 1100,
     db,
-    concurrence: 2,
+    concurrence: 4,
   };
 
   await populateDB(options);
